@@ -1,8 +1,9 @@
 language: bash
 
 before_script:
-    - "sudo curl -o /usr/local/bin/shunit2 https://raw.githubusercontent.com/kward/shunit2/master/shunit2"
+  - sudo curl -o /usr/local/bin/shunit2 https://raw.githubusercontent.com/kward/shunit2/master/shunit2
+  - sudo apt-get install -y openjdk-8-jdk
 
 script:
-    - bash src/test/bash/test-ca_create.sh
-    - bash src/test/bash/test-store_create.sh
+  - bash src/test/bash/test-ca_create.sh
+  - bash src/test/bash/test-store_create.sh

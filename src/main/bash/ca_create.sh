@@ -7,11 +7,11 @@ set -o nounset \
 
 PASSWORD="test1234"
 SUBJECT='/CN=ca1.example.com/OU=TEST/O=MYORG/L=PaloAlto/ST=Ca/C=US'
-NAME="casnakeoil-ca-1"
+FILE_NAME="casnakeoil-ca-1"
 VALID_DAYS=365
 
-KEY_FILE="${NAME}.key"
-CRT_FILE="${NAME}.crt"
+KEY_FILE="${FILE_NAME}.key"
+CRT_FILE="${FILE_NAME}.crt"
 
 # Cleanup files
 rm -f $KEY_FILE $CRT_FILE
@@ -22,5 +22,5 @@ openssl req -new -x509 \
   -out $CRT_FILE \
   -days $VALID_DAYS \
   -subj $SUBJECT \
-  -passin "pass:$PASSWORD" \
-  -passout "pass:$PASSWORD"
+  -passin pass:$PASSWORD \
+  -passout pass:$PASSWORD

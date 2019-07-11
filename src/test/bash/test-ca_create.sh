@@ -1,9 +1,14 @@
 #! /bin/sh
 
-SCRIPTS_DIR=../../main/bash
+SCRIPTS_DIR=./src/main/bash
 
-testCACreate(){
+testCACreateWithDefaults(){
 	/bin/sh "$SCRIPTS_DIR/ca_create.sh"
-	assertTrue 'Key File missing' "[ -r casnakeoil-ca-1.key' ]"
-	assertTrue 'CRT File Missing' "[ -r casnakeoil-ca-1.crt' ]"
+	
+	assertTrue 'Key File Missing' "[ -r $PWD/casnakeoil-ca-1.key ]"
+	assertTrue 'CRT File Missing' "[ -r $PWD/casnakeoil-ca-1.crt ]"
+	assertTrue 'Invalid CA Key' "openssl rsa -in casnakeoil-ca-1.key -check -noout -passin pass:test1234"
 }
+
+
+. shunit2

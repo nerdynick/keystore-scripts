@@ -3,7 +3,7 @@
 SCRIPTS_DIR=./src/main/bash
 
 testCACreateWithDefaults(){
-	/bin/sh "$SCRIPTS_DIR/ca_create.sh"
+	/bin/bash "$SCRIPTS_DIR/ca_create.sh"
 	
 	assertTrue 'Key File Missing' "[ -r $PWD/casnakeoil-ca-1.key ]"
 	assertTrue 'CRT File Missing' "[ -r $PWD/casnakeoil-ca-1.crt ]"

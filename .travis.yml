@@ -5,3 +5,4 @@ before_script:
 
 script:
     - bash src/test/bash/test-ca_create.sh
+    - bash src/test/bash/test-store_create.sh

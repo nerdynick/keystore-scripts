@@ -1,3 +1,6 @@
 .project
-**/casnakeoil-ca-1.crt  
-**/casnakeoil-ca-1.key
+*.key
+*.srl
+*.crt
+*.csr
+*.jks

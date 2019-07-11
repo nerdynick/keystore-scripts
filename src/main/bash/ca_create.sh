@@ -18,9 +18,9 @@ rm -f $KEY_FILE $CRT_FILE
 
 # Generate CA key
 openssl req -new -x509 \
-  -keyout $KEY_FILE \
-  -out $CRT_FILE \
-  -days $VALID_DAYS \
-  -subj $SUBJECT \
-  -passin pass:$PASSWORD \
-  -passout pass:$PASSWORD
+	-keyout $KEY_FILE \
+	-out $CRT_FILE \
+	-days $VALID_DAYS \
+	-subj $SUBJECT \
+	-passin pass:$PASSWORD \
+	-passout pass:$PASSWORD

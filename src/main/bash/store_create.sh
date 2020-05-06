@@ -11,7 +11,7 @@ CA_CRT_FILE="casnakeoil-ca-1.crt"
 CA_KEY_FILE="casnakeoil-ca-1.key"
 VALID_DAYS=365
 
-if [ ! -z "$2" ]
+if [ ! -z "${2+x}" ]
 then
   EXTRA=",$2"
 fi
@@ -20,15 +20,19 @@ echo "------------------------------- $HOST -------------------------------"
 echo "------------------------------- $EXTRA -------------------------------"
 
 KEYSTORE_FILE="${HOST}.keystore.jks"
+P12_KEYSTORE_FILE="${HOST}.keystore.p12"
 TRUSTSTORE_FILE="${HOST}.truststore.jks"
+KEY_FILE="${HOST}-key.pem"
 CSR_FILE="${HOST}.csr"
 CRT_FILE="${HOST}-ca1-signed.crt"
 
 #Cleanup older version 
 rm -rf $KEYSTORE_FILE
+rm -rf $P12_KEYSTORE_FILE
 rm -rf $TRUSTSTORE_FILE
 rm -rf $CSR_FILE
 rm -rf $CRT_FILE
+rm -rf $KEY_FILE
 
 # Create host keystore
 keytool -genkey -noprompt \
@@ -39,6 +43,18 @@ keytool -genkey -noprompt \
 	-keyalg RSA \
 	-storepass $PASSWORD \
 	-keypass $PASSWORD
+	
+# Export Private Key and convert to PEM
+keytool -importkeystore \
+    -srckeystore $KEYSTORE_FILE \
+    -srcalias $HOST \
+    -srcstorepass $PASSWORD \
+    -destkeystore $P12_KEYSTORE_FILE \
+    -deststoretype PKCS12 \
+    -deststorepass $PASSWORD \
+    -destkeypass $PASSWORD
+    
+openssl pkcs12 -in $P12_KEYSTORE_FILE  -nodes -nocerts -out $KEY_FILE -passin pass:$PASSWORD -passout pass:$PASSWORD
 
 # Create the certificate signing request (CSR)
 keytool -storetype jks \

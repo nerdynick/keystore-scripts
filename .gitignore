@@ -4,3 +4,4 @@
 *.crt
 *.csr
 *.jks
+.DS_Store

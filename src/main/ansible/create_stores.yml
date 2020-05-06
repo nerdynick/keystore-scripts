@@ -1,0 +1,28 @@
+- name: Cert Store Generator
+  hosts: localhost
+  connection: local
+  vars:
+    subject: "/C=US/ST=Colorado/L=Denver/O=Dis"
+    valid: 365
+    ca_password: test1234
+    key_password: test1234
+    store_password: test1234
+    ca_crt_file: casnakeoil.crt
+    ca_key_file: casnakeoil.key
+  tasks:
+  - name: "Creating Key and CSR"
+    script:
+      cmd: "create_key-csr.sh {{item}} {{key_password}} {{valid}} {{subject}}"
+    with_items:
+    - "{{ groups['all'] }}"
+  - name: "Sign Keys"
+    script:
+      cmd: "sign_csr.sh {{item}} {{key_password}} {{ca_password}} {{ca_crt_file}} {{ca_key_file}} {{valid}}"
+    with_items:
+    - "{{ groups['all'] }}"
+  - name: "Creating Stores"
+    script:
+      cmd: "create_stores.sh {{item}} {{key_password}} {{store_password}} {{ca_crt_file}}"
+    with_items:
+    - "{{ groups['all'] }}"
+      

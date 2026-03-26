@@ -28,7 +28,6 @@ CSR_TRUSTSTORE_PASSWORD?=test1234
 #Client-Server Pair Configs
 CLIENT_FILENAME_PREFIX?="Client-Example"
 CLIENT_KEY_FILENAME="${OUTPUT_FOLDER}/${CLIENT_FILENAME_PREFIX}-key.pem"
-CLIENT_CSR_FILENAME="${OUTPUT_FOLDER}/${CLIENT_FILENAME_PREFIX}-csr.pem"
 CLIENT_CERT_FILENAME="${OUTPUT_FOLDER}/${CLIENT_FILENAME_PREFIX}-cert.pem"
 CLIENT_P12_FILENAME="${OUTPUT_FOLDER}/${CLIENT_FILENAME_PREFIX}.p12"
 CLIENT_EXP_DAYS?="365"
@@ -40,7 +39,6 @@ CLIENT_TRUSTSTORE_PASSWORD?=test1234
 
 SERVER_FILENAME_PREFIX?="Server-Example"
 SERVER_KEY_FILENAME="${OUTPUT_FOLDER}/${SERVER_FILENAME_PREFIX}-key.pem"
-SERVER_CSR_FILENAME="${OUTPUT_FOLDER}/${SERVER_FILENAME_PREFIX}-csr.pem"
 SERVER_CERT_FILENAME="${OUTPUT_FOLDER}/${SERVER_FILENAME_PREFIX}-cert.pem"
 SERVER_P12_FILENAME="${OUTPUT_FOLDER}/${SERVER_FILENAME_PREFIX}.p12"
 SERVER_EXP_DAYS?="365"
@@ -63,6 +61,7 @@ setup:
 .PHONY: create-ca
 create-ca: setup
 	openssl req -new -x509 -outform PEM \
+		-addext "keyUsage=critical, digitalSignature, cRLSign, keyCertSign" \
 		-keyout $(CA_KEY_FILENAME) \
 		-out $(CA_CERT_FILENAME) \
 		-days $(CA_EXP_DAYS) \
@@ -109,7 +108,6 @@ sign-csr: setup
 		-in $(CSR_CSR_FILENAME) \
 		-out $(CSR_CERT_FILENAME) \
 		-days $(CSR_EXP_DAYS) \
-		-CAcreateserial \
 		-passin env:CA_PASSWORD
 
 	openssl pkcs12 \
@@ -138,21 +136,17 @@ create-sign-cert-with-jks: create-sign-cert create-csr-jks
 
 .PHONY: create-client
 create-client: setup
-	openssl req -new -outform PEM \
-		-keyout $(CLIENT_KEY_FILENAME) \
-		-out $(CLIENT_CSR_FILENAME) \
-		-subj $(CLIENT_SUBJECT) \
-		-passin env:CLIENT_PASSWORD \
-		-passout env:CLIENT_PASSWORD
-
-	openssl x509 -req -outform PEM \
+	openssl req -new -x509 -outform PEM \
+		-addext "keyUsage=nonRepudiation, digitalSignature, keyEncipherment" \
+		-addext "extendedKeyUsage=clientAuth, codeSigning, emailProtection" \
 		-CA $(CA_CERT_FILENAME) \
 		-CAkey $(CA_KEY_FILENAME) \
-		-in $(CLIENT_CSR_FILENAME) \
+		-keyout $(CLIENT_KEY_FILENAME) \
 		-out $(CLIENT_CERT_FILENAME) \
+		-subj $(CLIENT_SUBJECT) \
 		-days $(CLIENT_EXP_DAYS) \
-		-CAcreateserial \
-		-passin env:CA_PASSWORD
+		-passin env:CA_PASSWORD \
+		-passout env:CLIENT_PASSWORD
 
 	openssl pkcs12 \
 		-export \
@@ -178,20 +172,16 @@ create-client-with-jks: create-client create-client-jks
 .PHONY: create-server
 create-server: setup
 	openssl req -new -outform PEM \
-		-keyout $(SERVER_KEY_FILENAME) \
-		-out $(SERVER_CSR_FILENAME) \
-		-subj $(SERVER_SUBJECT) \
-		-passin env:SERVER_PASSWORD \
-		-passout env:SERVER_PASSWORD
-
-	openssl x509 -req -outform PEM \
+		-addext "keyUsage=nonRepudiation, digitalSignature, keyEncipherment" \
+		-addext "extendedKeyUsage=serverAuth, clientAuth, codeSigning, emailProtection" \
 		-CA $(CA_CERT_FILENAME) \
 		-CAkey $(CA_KEY_FILENAME) \
-		-in $(SERVER_CSR_FILENAME) \
+		-keyout $(SERVER_KEY_FILENAME) \
 		-out $(SERVER_CERT_FILENAME) \
+		-subj $(SERVER_SUBJECT) \
 		-days $(SERVER_EXP_DAYS) \
-		-CAcreateserial \
-		-passin env:CA_PASSWORD
+		-passin env:CA_PASSWORD \
+		-passout env:SERVER_PASSWORD
 
 	openssl pkcs12 \
 		-export \

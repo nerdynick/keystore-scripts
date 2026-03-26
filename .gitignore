@@ -5,3 +5,4 @@
 *.csr
 *.jks
 .DS_Store
+output/**

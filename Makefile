@@ -6,8 +6,9 @@ CA_KEY_FILENAME="${OUTPUT_FOLDER}/${CA_FILENAME_PREFIX}-key.pem"
 CA_CERT_FILENAME="${OUTPUT_FOLDER}/${CA_FILENAME_PREFIX}-cert.pem"
 CA_P12_FILENAME="${OUTPUT_FOLDER}/${CA_FILENAME_PREFIX}.p12"
 CA_EXP_DAYS?="365"
-CA_SUBJECT?="/CN=ca.example.com/OU=TEST/O=MYORG/L=PaloAlto/ST=Ca/C=US"
+CA_SUBJECT?="/CN=ca.example.com/L=PaloAlto/ST=Ca/C=US"
 CA_PASSWORD?=test123
+CA_SANS?=("DNS:ca.example.com")
 
 CA_TRUSTSTORE="${OUTPUT_FOLDER}/${CA_FILENAME_PREFIX}-trust.jks"
 CA_TRUSTSTORE_PASSWORD?=test123
@@ -33,6 +34,7 @@ CLIENT_P12_FILENAME="${OUTPUT_FOLDER}/${CLIENT_FILENAME_PREFIX}.p12"
 CLIENT_EXP_DAYS?="365"
 CLIENT_SUBJECT?="/CN=client.example.com/OU=TEST/O=MYORG/L=PaloAlto/ST=Ca/C=US"
 CLIENT_PASSWORD?=test1234
+CLIENT_SANS?=("DNS:client.example.com")
 
 CLIENT_TRUSTSTORE="${OUTPUT_FOLDER}/${CLIENT_FILENAME_PREFIX}.jks"
 CLIENT_TRUSTSTORE_PASSWORD?=test1234
@@ -44,13 +46,14 @@ SERVER_P12_FILENAME="${OUTPUT_FOLDER}/${SERVER_FILENAME_PREFIX}.p12"
 SERVER_EXP_DAYS?="365"
 SERVER_SUBJECT?="/CN=server.example.com/OU=TEST/O=MYORG/L=PaloAlto/ST=Ca/C=US"
 SERVER_PASSWORD?=test1234
+SERVER_SANS?=("DNS:server.example.com")
 
 SERVER_TRUSTSTORE="${OUTPUT_FOLDER}/${SERVER_FILENAME_PREFIX}.jks"
 SERVER_TRUSTSTORE_PASSWORD?=test1234
 
 .PHONY: clean
 clean:
-	rm -R $(OUTPUT_FOLDER)
+	rm -Rf $(OUTPUT_FOLDER)
 
 .PHONY: setup
 setup:
@@ -62,6 +65,7 @@ setup:
 create-ca: setup
 	openssl req -new -x509 -outform PEM \
 		-addext "keyUsage=critical, digitalSignature, cRLSign, keyCertSign" \
+		-addext "subjectAltName=$(CA_SANS)" \
 		-keyout $(CA_KEY_FILENAME) \
 		-out $(CA_CERT_FILENAME) \
 		-days $(CA_EXP_DAYS) \
@@ -139,6 +143,7 @@ create-client: setup
 	openssl req -new -x509 -outform PEM \
 		-addext "keyUsage=nonRepudiation, digitalSignature, keyEncipherment" \
 		-addext "extendedKeyUsage=clientAuth, codeSigning, emailProtection" \
+		-addext "subjectAltName=$(CLIENT_SANS)" \
 		-CA $(CA_CERT_FILENAME) \
 		-CAkey $(CA_KEY_FILENAME) \
 		-keyout $(CLIENT_KEY_FILENAME) \
@@ -174,7 +179,7 @@ create-server: setup
 	openssl req -new -outform PEM \
 		-addext "keyUsage=nonRepudiation, digitalSignature, keyEncipherment" \
 		-addext "extendedKeyUsage=serverAuth, clientAuth, codeSigning, emailProtection" \
-		-CA $(CA_CERT_FILENAME) \
+		-addext "subjectAltName=$(SERVER_SANS)" \
 		-CAkey $(CA_KEY_FILENAME) \
 		-keyout $(SERVER_KEY_FILENAME) \
 		-out $(SERVER_CERT_FILENAME) \

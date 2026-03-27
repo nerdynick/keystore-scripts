@@ -34,7 +34,6 @@ CLIENT_P12_FILENAME="${OUTPUT_FOLDER}/${CLIENT_FILENAME_PREFIX}.p12"
 CLIENT_EXP_DAYS?="365"
 CLIENT_SUBJECT?="/CN=client.example.com/OU=TEST/O=MYORG/L=PaloAlto/ST=Ca/C=US"
 CLIENT_PASSWORD?=test1234
-CLIENT_SANS?=("DNS:client.example.com")
 
 CLIENT_TRUSTSTORE="${OUTPUT_FOLDER}/${CLIENT_FILENAME_PREFIX}.jks"
 CLIENT_TRUSTSTORE_PASSWORD?=test1234
@@ -143,7 +142,6 @@ create-client: setup
 	openssl req -new -x509 -outform PEM \
 		-addext "keyUsage=nonRepudiation, digitalSignature, keyEncipherment" \
 		-addext "extendedKeyUsage=clientAuth, codeSigning, emailProtection" \
-		-addext "subjectAltName=$(CLIENT_SANS)" \
 		-CA $(CA_CERT_FILENAME) \
 		-CAkey $(CA_KEY_FILENAME) \
 		-keyout $(CLIENT_KEY_FILENAME) \

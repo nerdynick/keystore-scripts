@@ -180,6 +180,7 @@ create-server: setup
 		-addext "keyUsage=nonRepudiation, digitalSignature, keyEncipherment" \
 		-addext "extendedKeyUsage=serverAuth, clientAuth, codeSigning, emailProtection" \
 		-addext "subjectAltName=$(SERVER_SANS)" \
+		-CA $(CA_CERT_FILENAME) \
 		-CAkey $(CA_KEY_FILENAME) \
 		-keyout $(SERVER_KEY_FILENAME) \
 		-out $(SERVER_CERT_FILENAME) \

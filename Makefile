@@ -174,6 +174,26 @@ create-client-jks: setup
 .PHONY: create-client-with-jks
 create-client-with-jks: create-client create-client-jks
 
+.PHONY: create-client-noenc
+create-client-noenc: setup
+	openssl req -new -x509 -outform PEM -noenc \
+		-addext "keyUsage=nonRepudiation, digitalSignature, keyEncipherment" \
+		-addext "extendedKeyUsage=clientAuth, codeSigning, emailProtection" \
+		-CA $(CA_CERT_FILENAME) \
+		-CAkey $(CA_KEY_FILENAME) \
+		-keyout $(CLIENT_KEY_FILENAME) \
+		-out $(CLIENT_CERT_FILENAME) \
+		-subj $(CLIENT_SUBJECT) \
+		-days $(CLIENT_EXP_DAYS) \
+		-passin env:CA_PASSWORD
+
+	openssl pkcs12 \
+		-export \
+		-in $(CLIENT_CERT_FILENAME) \
+		-inkey $(CLIENT_KEY_FILENAME) \
+		-out $(CLIENT_P12_FILENAME) \
+		-passout env:CLIENT_PASSWORD
+
 .PHONY: create-server
 create-server: setup
 	openssl req -new -x509 -outform PEM \

@@ -176,7 +176,7 @@ create-client-with-jks: create-client create-client-jks
 
 .PHONY: create-server
 create-server: setup
-	openssl req -new -outform PEM \
+	openssl req -new -x509 -outform PEM \
 		-addext "keyUsage=nonRepudiation, digitalSignature, keyEncipherment" \
 		-addext "extendedKeyUsage=serverAuth, clientAuth, codeSigning, emailProtection" \
 		-addext "subjectAltName=$(SERVER_SANS)" \

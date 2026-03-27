@@ -19,7 +19,7 @@ SUBJECT_LOCAL="/L=${SUB_CITY}/ST=${SUB_STATE}/C=${SUB_COUNTRY}"
 
 read -p "Enter CA Domains (Space Separated): " -a CA_DOMAINS
 read -sp "Enter CA Password: " CA_PASSWORD
-echo "\n"
+echo ""
 
 export CA_PASSWORD="$CA_PASSWORD"
 export CA_FILENAME_PREFIX="Cluster-CA"
@@ -30,9 +30,9 @@ echo "$CA_SANS"
 
 make -f ../Makefile create-ca
 
-read -sp "Enter Server Password: \n" SERVER_PASSWORD
+read -sp "Enter Server Password: " SERVER_PASSWORD
 export SERVER_PASSWORD="$SERVER_PASSWORD"
-echo "\n"
+echo ""
 
 while true; do
     read -p "Enter Server Domains (Space Separated, or 'done' to finish): " -a SERVER_DOMAINS
@@ -46,9 +46,9 @@ while true; do
     make -f ../Makefile create-server
 done
 
-read -sp "Enter Client Password: \n" CLIENT_PASSWORD
+read -sp "Enter Client Password: " CLIENT_PASSWORD
 export CLIENT_PASSWORD="$CLIENT_PASSWORD"
-echo "\n"
+echo ""
 
 while true; do
     read -p "Enter Client Domains (Space Separated, or 'done' to finish): " -a CLIENT_DOMAINS
